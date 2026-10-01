@@ -1,0 +1,23 @@
+services:
+  retro-nfl:
+    build: .
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    network_mode: host
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 0.25
+    mem_limit: 96m
+    pids_limit: 32
+    environment:
+      TRONBYT_URL: ${TRONBYT_URL:?Set your Tronbyt server URL}
+    volumes:
+      - ${TRONBYT_DATA_DIR:?Set the existing Tronbyt data directory}:/tronbyt-data:ro
+      - ./devices.json:/config/devices.json:ro
+      - ./state:/state
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "2"
